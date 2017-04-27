@@ -6,19 +6,6 @@ chmod +x configure
 
 if [ $(uname) == Linux ]; then
 
-    # Download QtWebkit
-    curl "http://linorg.usp.br/Qt/community_releases/5.6/${PKG_VERSION}/qtwebkit-opensource-src-${PKG_VERSION}.tar.xz" > qtwebkit.tar.xz
-    unxz qtwebkit.tar.xz
-    tar xf qtwebkit.tar
-    mv qtwebkit-opensource-src* qtwebkit
-    patch -p0 < "${RECIPE_DIR}"/0001-qtwebkit-old-ld-compat.patch
-    patch -p0 < "${RECIPE_DIR}"/0002-qtwebkit-ruby-1.8.patch
-    patch -p0 < "${RECIPE_DIR}"/0003-qtwebkit-O_CLOEXEC-workaround.patch
-    patch -p0 < "${RECIPE_DIR}"/0004-qtwebkit-CentOS5-Fix-fucomip-compat-with-gas-2.17.50.patch
-    # From https://bugs.webkit.org/show_bug.cgi?id=70610, http://trac.webkit.org/changeset/172759, https://github.com/WebKit/webkit/commit/4d7f0f
-    patch -p0 < "${RECIPE_DIR}"/0005-qtwebkit-fix-TEXTREL-on-x86-changeset_172759.patch
-    rm qtwebkit.tar
-
     MAKE_JOBS=$CPU_COUNT
 
     ./configure -prefix $PREFIX \
@@ -45,7 +32,6 @@ if [ $(uname) == Linux ]; then
                 -skip wayland \
                 -skip canvas3d \
                 -skip 3d \
-                -skip webengine \
                 -system-libjpeg \
                 -system-libpng \
                 -system-zlib \
@@ -57,13 +43,7 @@ if [ $(uname) == Linux ]; then
                 -no-linuxfb \
                 -no-libudev \
                 -no-avx \
-                -no-avx2 \
-                -D _X_INLINE=inline \
-                -D XK_dead_currency=0xfe6f \
-                -D XK_ISO_Level5_Lock=0xfe13 \
-                -D FC_WEIGHT_EXTRABLACK=215 \
-                -D FC_WEIGHT_ULTRABLACK=FC_WEIGHT_EXTRABLACK \
-                -D GLX_GLXEXT_PROTOTYPES
+                -no-avx2
 # To get a much quicker turnaround you can add this: (remember also to add the backslash after GLX_GLXEXT_PROTOTYPES)
 # -skip qtwebsockets -skip qtwebchannel -skip qtwayland -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -skip qttools
 
