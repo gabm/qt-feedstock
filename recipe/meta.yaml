@@ -56,16 +56,6 @@ requirements:
     - vc 10  # [win and py34]
     - vc 14  # [win and py>=35]
 
-test:
-  files:
-    - test/hello.pro
-    - test/main.cpp
-  commands:
-    - conda inspect linkages -p $PREFIX qt  # [not win]
-    - conda inspect objects -p $PREFIX qt  # [osx]
-    - if not exist %LIBRARY_BIN%\\Qt5WebKit.dll exit 1  # [win]
-    - test -f $PREFIX/lib/libQt5WebKit.so  # [linux]
-
 about:
   home: http://qt-project.org
   license: LGPL-3.0

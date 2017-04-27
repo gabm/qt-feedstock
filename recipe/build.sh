@@ -43,7 +43,8 @@ if [ $(uname) == Linux ]; then
                 -no-linuxfb \
                 -no-libudev \
                 -no-avx \
-                -no-avx2
+                -no-avx2 \
+		-no-opengl
 # To get a much quicker turnaround you can add this: (remember also to add the backslash after GLX_GLXEXT_PROTOTYPES)
 # -skip qtwebsockets -skip qtwebchannel -skip qtwayland -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -skip qttools
 
