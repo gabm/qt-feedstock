@@ -1,13 +1,3 @@
-
-:: Currently, we only support qtwebit, in future we may support
-:: qtwebengine for MSVC 2015 and above. Have left qtwebengine code in
-:: from upstream recipe (https://github.com/ContinuumIO/anaconda-recipes/blob/master/qt/bld.bat)
-set WEBBACKEND=qtwebkit
-
-:: Add the gnuwin32 tools to PATH - needed for webkit
-:: Ruby is also needed but this is supplied by AppVeyor
-set PATH=%cd%\gnuwin32\bin;%PATH%
-
 where ruby.exe
 if %ERRORLEVEL% neq 0 (
   echo Could not find ruby.exe
@@ -18,55 +8,6 @@ where perl.exe
 if %ERRORLEVEL% neq 0 (
   echo Could not find perl.exe
   exit /b 1
-)
-
-:: Install a custom python 27 environment for us, to use in building webengine which needs Py27, but avoid feature activation
-:: At present (5th July 2016) calling `conda create -y -n python27_qt5_build python=2.7` causes the build to
-:: fail immediately after, so I'm bodging around that by not doing it if it exists.  This means you must run
-:: the builds twice. Sorry. Time is not on my side here.
-if "%WEBBACKEND%" == "qtwebengine" (
-  if not exist %SYS_PREFIX%\envs\python27_qt5_build (
-    conda create -y -n python27_qt5_build python=2.7
-  )
-  set "PATH=%SYS_PREFIX%\envs\python27_qt5_build;%SYS_PREFIX%\envs\python27_qt5_build\Scripts;%SYS_PREFIX%\envs\python27_qt5_build\Library\bin;%PATH%"
-)
-
-:: Webkit is not part of the distributed Qt5 tarballs anymore in 5.6 or after. 
-:: You need to download it separately and move it to the build directory by yourself. 
-set SHORT_VERSION=%PKG_VERSION:~0,-2%
-if "%DIRTY%" == "" (
-    if "%WEBBACKEND%" == "qtwebkit" (
-        :: TODO: checksum
-        curl -LO "http://download.qt.io/community_releases/%SHORT_VERSION%/%PKG_VERSION%/qtwebkit-opensource-src-%PKG_VERSION%.tar.xz"
-        if errorlevel 1 exit 1
-        7za x -so qtwebkit-opensource-src-%PKG_VERSION%.tar.xz | 7za x -si -aoa -ttar > NUL 2>&1
-        if errorlevel 1 exit 1
-        move qtwebkit-opensource-src-%PKG_VERSION% qtwebkit
-        if errorlevel 1 exit 1
-    )
-)
-
-:: WebEngine (Chromium) specific definitions.  Only build this when we decide to 
-:: move away from qtwebkit for MSCV >= 2015
-if "%WEBBACKEND%" == "qtwebengine" (
-  set "WSDK8=C:\\Program\ Files\ (x86)\\Windows\ Kits\\8.1"
-  set "WDK=C:\\WinDDK\\7600.16385.1"
-  set "INCLUDE=%WSDK8%\Include;%WDK%\inc;%INCLUDE%"
-  if "%ARCH%"=="32" (
-    set "PATH=%WSDK8%\bin\x86;%WDK$%\bin\x86;%PATH%"
-    set "LIB=%LIB%;%WSDK8%\Lib\winv6.3\um\x86"
-  ) else (
-    set "PATH=%WSDK8%\bin\x64;%WDK$%\bin\amd64;%PATH%"
-    set "LIB=%LIB%;%WSDK8%\Lib\winv6.3\um\x64"
-  )
-  set "GYP_DEFINES=windows_sdk_path='%WSDK8%'"
-  set GYP_MSVS_VERSION=2015
-  set GYP_GENERATORS=ninja
-  set GYP_PARALLEL=1
-  set "WDK_DIR=%WDK%"
-  set "WindowsSDKDir=%WSDK8%"
-) else (
-  rmdir /s /q qtwebengine
 )
 
 :: Get the paths right 
